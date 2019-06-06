@@ -1,0 +1,114 @@
+CREATE (f:Firewall {Hostname : "uk2-rc-int240-cl1" }), (g:Firewall {Hostname : "dc1-rc-core1500-cl1"}), (h:Firewall {Hostname : "dc2-rc-core1500-cl1"})
+
+RETURN f,g,h
+
+ 
+
+ 
+
+CREATE (f:Sec_zone {Name : "LAN", Device : "uk2-rc-int240-cl1"}), (g:Sec_zone {Name : "WAN", Device : "uk2-rc-int240-cl1"})
+
+RETURN f,g
+
+ 
+
+ 
+
+CREATE (f:Sec_zone {Name : "INSIDE", Device : "dc1-rc-core1500-cl1"}), (g:Sec_zone {Name : "OUTSIDE", Device : "dc1-rc-core1500-cl1"})
+
+RETURN f,g
+
+ 
+
+ 
+
+CREATE (f:Sec_zone {Name : "INSIDE", Device : "dc2-rc-core1500-cl1"}), (g:Sec_zone {Name : "OUTSIDE", Device : "dc2-rc-core1500-cl1"})
+
+RETURN f,g
+
+ 
+
+ 
+
+CREATE (s1:Subnet {Range: '10.171.0.0/19'}), (s2:Subnet {Range: '10.100.0.0/16'}), (s3:Subnet {Range: '10.200.0.0/16'}), (s4:Subnet {Range: '10.205.0.0/16'})
+
+RETURN s1,s2,s3, s4
+
+ 
+
+ 
+
+ 
+
+#RELATIONSHIP Sec_Zone -> Firewall
+
+MATCH (f:Firewall), (s:Sec_zone)
+
+WHERE f.Hostname = "uk2-rc-int240-cl1" AND s.Name = "LAN"
+
+CREATE (f)<-[bt:BELONGS_TO]-(s)
+
+RETURN f,s
+
+ 
+
+ 
+
+MATCH (f:Firewall), (s:Sec_zone)
+
+WHERE f.Hostname = "uk2-rc-int240-cl1" AND s.Name = "WAN"
+
+CREATE (f)<-[bt:BELONGS_TO]-(s)
+
+RETURN f,s
+
+ 
+
+ 
+
+MATCH (f:Firewall), (s:Sec_zone)
+
+WHERE f.Hostname = "uk2-rc-int240-cl1" AND (s.Name = "LAN" OR s.Name = "WAN")
+
+RETURN f,s
+
+ 
+
+ 
+
+#RELATIONSHIP Subnet -> Sec_zone
+
+MATCH (s:Subnet {Range: '10.171.0.0/19'}), (se:Sec_zone {Name: 'LAN', Device: "uk2-rc-int240-cl1"})
+
+CREATE (s)-[a:ATTACHED_TO]->(se)
+
+RETURN s,se
+
+ 
+
+ 
+
+MATCH (s:Subnet {Range: '10.100.0.0/16'}), (se:Sec_zone {Name: 'INSIDE', Device: "dc1-rc-core1500-cl1"})
+
+CREATE (s)-[a:ATTACHED_TO]->(se)
+
+RETURN s,se
+
+ 
+
+ 
+
+MATCH (s:Subnet {Range: '10.200.0.0/16'}), (se:Sec_zone {Name: 'INSIDE', Device: "dc2-rc-core1500-cl1"})
+
+CREATE (s)-[a:ATTACHED_TO]->(se)
+
+RETURN s,se
+
+ 
+
+ 
+
+MATCH (s:Subnet {Range: '10.205.0.0/16'}), (se:Sec_zone {Name: 'INSIDE', Device: "dc2-rc-core1500-cl1"})
+
+
+
